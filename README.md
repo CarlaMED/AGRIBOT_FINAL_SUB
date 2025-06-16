@@ -3,7 +3,7 @@ Final project files for AgribotSim simulation with CNN classifier
 Open project, make sure toolboxes are installed, open models folder and open recoverattempt_top_model
 run project- to visualise the data please see the data inspector or look inside ANALYSIS 
 and PREDICTION VALIDATION AND PREDICTION IDENTIFICATION BLOCKS of the model.
- please contact me if you have any issues running the simulation. carla@dorricott.net S1706516@glos.ac.uk or 07913911616
+ please contact me if you have any issues running the simulation.
 • Deep Learning Toolbox
 • Computer Vision Toolbox
 • Simulink
