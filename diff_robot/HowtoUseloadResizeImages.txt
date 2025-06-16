@@ -1,0 +1,2 @@
+folderPath = 'C:\FINALYEAR\Induvidual Research Project\AgriBotSim\archive\PlantVillageData\PlantVillage\train\resized_images';
+[images, labels] = loadResizedImages(folderPath);

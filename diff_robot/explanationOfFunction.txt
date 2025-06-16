@@ -1,0 +1,31 @@
+so teh analysis controller fucntion is designed to feed into the visual sensor model essentially to act as a  traffic controller. 
+Analysis Controller's Role:
+
+    It determines when analysis should happen.
+    When waypointReached is true and it transitions to Stopped For Analysis mode, it sets its output triggerNNAnalysis to true.
+
+triggerNNAnalysis Signal's Role:
+
+    This boolean signal (true when analysis is needed, false otherwise) is then connected to the Enable port of the "Visual Sensor Model" subsystem.
+
+"Visual Sensor Model" Subsystem's Role:
+
+    This is the subsystem thats already built, which contains:
+        the fakeCameraPOV (the MATLAB Function block that creates the image based on the robot's position).
+        The image processing blocks (Convert Image to single, Resize).
+        the Deep Learning "Predict" block (the one using getTomatoNet).
+        The get_label MATLAB Function block.
+
+    Crucially, because it's an Enabled Subsystem:
+        When triggerNNAnalysis is true, the "Visual Sensor Model" subsystem becomes active. It will run one simulation step, take the simulated image input, process it, feed it to the CNN, get a prediction, and generate the analysisFinished output signal.
+        When triggerNNAnalysis is false, the "Visual Sensor Model" subsystem is inactive. It will not execute, and its outputs will hold their last value or default to zero.
+
+analysisFinished Signal's Role:
+
+    Once the "Visual Sensor Model" has completed its analysis (i.e., its CNN has made a prediction for that image), it needs to output a true pulse on its analysisFinished signal.
+    This analysisFinished signal then feeds back as an input to the Analysis Controller MATLAB Function block.
+
+Back to Analysis Controller:
+
+    Upon receiving analysisFinished = true, the Analysis Controller knows the analysis is done for the current waypoint.
+    It then deactivates triggerNNAnalysis (disabling the "Visual Sensor Model") and activates goToNextWaypoint, allowing the robot to proceed.

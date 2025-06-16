@@ -1,0 +1,84 @@
+class AnalysisController:
+    """
+    Manages the robot's mission states: Moving, Stopped_Analyzing.
+    """
+    
+    # Define states as class constants for readability
+    MODE_MOVING = 0
+    MODE_STOPPED_ANALYZING = 1
+
+    def __init__(self):
+        """
+        Initializes the mission manager.
+        """
+        self.current_mode = self.MODE_MOVING # Robot starts in 'Moving' mode
+
+    def update(self, waypoint_reached: bool, analysis_finished: bool) -> tuple[bool, bool, bool]:
+        """
+        Updates the robot's mission state and determines control commands.
+
+        Args:
+            waypoint_reached (bool): True if the robot has reached the current waypoint.
+            analysis_finished (bool): True if the analysis (e.g., CNN) is complete.
+
+        Returns:
+            tuple[bool, bool, bool]: 
+                (robot_stop_cmd, trigger_nn_analysis, go_to_next_waypoint)
+        """
+        
+        # Initialize outputs for the current update cycle
+        robot_stop_cmd = False
+        trigger_nn_analysis = False
+        go_to_next_waypoint = False
+
+        # State Machine Logic
+        if self.current_mode == self.MODE_MOVING:
+            if waypoint_reached:
+                # Transition to 'Stopped For Analysis' mode
+                self.current_mode = self.MODE_STOPPED_ANALYZING
+                robot_stop_cmd = True         # Command robot to stop
+                trigger_nn_analysis = True    # Trigger the NN analysis
+                # go_to_next_waypoint remains False
+
+        elif self.current_mode == self.MODE_STOPPED_ANALYZING:
+            robot_stop_cmd = True         # Keep robot stopped
+            trigger_nn_analysis = True    # Keep analysis triggered
+
+            if analysis_finished:
+                # Transition back to 'Moving' mode
+                self.current_mode = self.MODE_MOVING
+                robot_stop_cmd = False        # Release robot stop command
+                trigger_nn_analysis = False   # Deactivate NN analysis trigger
+                go_to_next_waypoint = True     # Signal to advance to the next waypoint
+            # else: Stay in 'Stopped For Analysis' mode
+
+        return robot_stop_cmd, trigger_nn_analysis, go_to_next_waypoint
+
+# --- Example Usage (simulating steps) ---
+if __name__ == "__main__":
+    manager = RobotMissionManager()
+
+    print("--- Simulation Start ---")
+
+    # Step 1: Robot is moving
+    print(f"Step 1 (Moving): {manager.update(False, False)}") # (False, False, False) - robot moves
+
+    # Simulate some steps where robot is still moving
+    print(f"Step 2 (Moving): {manager.update(False, False)}")
+    print(f"Step 3 (Moving): {manager.update(False, False)}")
+
+    # Step 4: Waypoint is reached
+    print(f"\nStep 4 (Waypoint Reached): {manager.update(True, False)}") # (True, True, False) - robot stops, analysis starts
+
+    # Step 5: Robot is stopped, analysis ongoing
+    print(f"Step 5 (Analyzing): {manager.update(False, False)}") # (True, True, False) - still stopped, analysis continues
+    print(f"Step 6 (Analyzing): {manager.update(False, False)}")
+
+    # Step 7: Analysis finishes
+    print(f"\nStep 7 (Analysis Finished): {manager.update(False, True)}") # (False, False, True) - robot moves, signal next waypoint
+
+    # Simulate some steps where robot is moving to next waypoint
+    print(f"Step 8 (Moving to next): {manager.update(False, False)}")
+    print(f"Step 9 (Moving to next): {manager.update(False, False)}")
+
+    print("\n--- Simulation End ---")
