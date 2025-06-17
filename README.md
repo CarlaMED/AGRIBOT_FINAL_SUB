@@ -5,7 +5,7 @@ run project- to visualise the data please see the data inspector or look inside 
 and PREDICTION VALIDATION AND PREDICTION IDENTIFICATION BLOCKS of the model.
  please contact me if you have any issues running the simulation.
 • Deep Learning Toolbox
-• Computer Vision Toolbox
+• Computer Vision Toolbox 
 • Simulink
 • Image Processing Toolbox
 • Parallel Computing Toolbox
